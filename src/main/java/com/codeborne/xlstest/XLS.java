@@ -1,8 +1,8 @@
 package com.codeborne.xlstest;
 
-import com.codeborne.xlstest.matchers.ContainsRow;
-import com.codeborne.xlstest.matchers.ContainsText;
-import com.codeborne.xlstest.matchers.DoesNotContainText;
+import com.codeborne.xlstest.matchers.XLS.ContainsRow;
+import com.codeborne.xlstest.matchers.XLS.ContainsText;
+import com.codeborne.xlstest.matchers.XLS.DoesNotContainText;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.hamcrest.Matcher;
