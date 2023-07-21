@@ -1,61 +1,93 @@
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.codeborne/xls-test/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.codeborne/xls-test)
-[![Coverage Status](https://coveralls.io/repos/github/codeborne/xls-test/badge.svg?branch=main)](https://coveralls.io/github/codeborne/xls-test?branch=main)
+### Gradle Testing
 
-# XLS Test
-Excel testing library
+```sh
+docker pull gradle:7.3.1-jdk11-alpine
+```
+```sh
+IMAGE=basic-xls-test-upstream
+docker image rm $IMAGE
+docker build -t $IMAGE -f Dockerfile .
+```
+* basic test
 
-Be sure that your code generates correct Excel!
+```sh
+mkdir build
+docker container run --rm -v $(pwd)/build:/work/build:rw $IMAGE
+ls -l build
+```
+```sh
+docker container run -v $(pwd)/build:/work/build:rw -it $IMAGE 
+```
+```text
+Welcome to Gradle 7.3.1!
 
-## How to use
+Here are the highlights of this release:
+ - Easily declare new test suites in Java projects
+ - Support for Java 17
+ - Support for Scala 3
 
-```java
-import com.codeborne.xlstest.XLS;
-import static com.codeborne.xlstest.XLS.*;
-import static org.hamcrest.MatcherAssert.assertThat;
+For more details see https://docs.gradle.org/7.3.1/release-notes.html
 
-public class ExcelContainsTextTest {
-  @Test
-  public void canAssertThatXlsContainsText() {
-    XLS spreadsheet = new XLS(getClass().getClassLoader().getResource("statement.xls"));
-    assertThat(spreadsheet, containsText("Statement"));
-  }
-}
+Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :libsProd
+> Task :libsTest
+> Task :compileJava
+> Task :processResources NO-SOURCE
+> Task :classes
+> Task :compileTestJava
+> Task :processTestResources
+> Task :testClasses
+
+> Task :test
+
+com.codeborne.xlstest.CreateXLSXTest > fromFile STANDARD_ERROR
+    ERROR StatusLogger Log4j2 could not find a logging implementation. Please add log4j-core to the classpath. Using SimpleLogger to log to the console...
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 8.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+See https://docs.gradle.org/7.3.1/userguide/command_line_interface.html#sec:command_line_warnings
+
+BUILD SUCCESSFUL in 51s
+6 actionable tasks: 6 executed
 ```
 
-## How to start
+### Troubleshooting
 
-If you use **Maven**, add the following dependency to pom.xml:
-
-```xml
-  <dependency>
-    <groupId>com.codeborne</groupId>
-    <artifactId>xls-test</artifactId>
-    <version>1.7.0</version>
-  </dependency>
+```sh
+docker container run --rm -v $(pwd)/build:/work/build:rw -it $IMAGE sh
 ```
 
-If you use **Gradle**, add the following dependency to build.gradle:
+in the container run
 
-```groovy
-  testCompile 'com.codeborne:xls-test:1.7.0'
+```sh
+gradle -d test
 ```
 
-## How to contribute
+### NOTE: 
 
-You are welcome to suggest your features and fixes!
+does not work with gradle __8.x__:
 
-Just fork the [xls-test](https://github.com/codeborne/xls-test) and create pull request.
-Any contribution is important!
+```sh
+docker pull gradle:8.1-jdk11-alpine
+```
+update `Dockerfile`  or
+```sh
+IMAGE=basic-xls-test-upstream-broken
+docker image rm $IMAGE
+docker build --build-arg "BASE=gradle:8.1-jdk11-alpine" -t $IMAGE -f Dockerfile .
+```
+```text
+Starting a Gradle Daemon (subsequent builds will be faster)
 
-**Become part of open-source community!**
+FAILURE: Build failed with an exception.
 
-# Thanks
+* Where:
+Script '/work/gradle/publish.gradle' line: 11
 
-Many thanks to these incredible tools that help us to create open-source software:
+* What went wrong:
+A problem occurred evaluating script.
+> Could not set unknown property 'classifier' for task ':sourcesJar' of type org.gradle.api.tasks.bundling.Jar.
 
-![Intellij IDEA](https://cloud.google.com/tools/images/icon_IntelliJIDEA.png)
-
-![YourKit Java profiler](http://selenide.org/images/yourkit.png)
-
-# License
-xls-test is open-source project and distributed under [MIT](http://choosealicense.com/licenses/mit/) license
+```
