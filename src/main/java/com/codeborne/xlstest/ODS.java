@@ -11,6 +11,7 @@ import org.hamcrest.Matcher;
 import org.jopendocument.dom.ODDocument;
 import org.jopendocument.dom.ODPackage;
 import org.jopendocument.dom.ODValueType;
+import org.jopendocument.dom.spreadsheet.Cell;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
 
 import static com.codeborne.xlstest.IO.readBytes;
@@ -65,37 +66,32 @@ public class ODS {
 		return new DoesNotContainText(text);
 	}
 
+	// see also:
+	// https://stackoverflow.com/questions/64423111/javajopendocument-nullpointerexception-when-using-getcellat0-0
 	// https://www.jopendocument.org/docs/org/jopendocument/dom/ODValueType.html
-	public Object safeOOCellValue(
-			org.jopendocument.dom.spreadsheet.Cell<ODDocument> cell) {
+	public Object safeOOCellValue(Cell<ODDocument> cell) {
 		if (cell == null) {
 			return null;
 		}
 		Object result;
+		String data = cell.getElement().getValue();
 		ODValueType type = cell.getValueType();
 		switch (type) {
 		case FLOAT:
-			result = Double.valueOf(cell.getValue().toString());
+			result = Double.valueOf(data);
 			break;
 		case STRING:
-			// NOTE: NPE
-			// try {
-			result = cell.getTextValue();
-			// } catch (java.lang.NullPointerException e) {
-			// result = "";
-			// }
+			result = data;
 			break;
 		case TIME:
 			result = null; // TODO
 			break;
 		case BOOLEAN:
-			result = Boolean.getBoolean(cell.getValue().toString());
+			result = Boolean.getBoolean(data);
 			break;
 		default:
 			throw new IllegalStateException("Can't evaluate cell value");
 		}
-		// return (result == null) ? null : result.toString();
 		return result;
 	}
-
 }
